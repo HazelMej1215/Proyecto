@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plataforma de Streaming - Administrador</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand__logo">PS</div>
+      <div class="brand__text">
+        <div class="brand__title">Plataforma de Streaming</div>
+        <div class="brand__subtitle">Panel de Administración</div>
+      </div>
+    </div>
+
+    <div class="topbar__right">
+      <span class="pill" id="adminName">Administrador</span>
+      <button class="btn btn--ghost" id="btnLogout" type="button">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="tabs">
+      <button class="tab is-active" data-tab="tab-peliculas-reg">Registrar nueva película</button>
+      <button class="tab" data-tab="tab-peliculas-cons">Consultar Películas</button>
+      <button class="tab" data-tab="tab-clientes">Consultar clientes</button>
+      <button class="tab" data-tab="tab-usuarios">Registro de usuarios</button>
+    </section>
+
+    <section class="panel">
+      <!-- TAB 1: REGISTRAR PELÍCULA -->
+      <div class="tabview is-active" id="tab-peliculas-reg">
+        <h2 class="panel__title">Registrar nueva película</h2>
+
+        <form class="form" id="formMovieCreate">
+          <div class="grid">
+            <div class="field">
+              <label class="label" for="movieTitle">Nombre de la película</label>
+              <input class="input" id="movieTitle" name="movieTitle" type="text" placeholder="Ej. Inception" autocomplete="off" />
+              <p class="hint" data-error-for="movieTitle"></p>
+            </div>
+
+            <div class="field">
+              <label class="label" for="movieGenre">Seleccionar género</label>
+              <select class="input" id="movieGenre" name="movieGenre">
+                <option value="">Selecciona una opción</option>
+                <option>Acción</option>
+                <option>Comedia</option>
+                <option>Drama</option>
+                <option>Terror</option>
+                <option>Ciencia ficción</option>
+                <option>Animación</option>
+                <option>Documental</option>
+              </select>
+              <p class="hint" data-error-for="movieGenre"></p>
+            </div>
+
+            <div class="field">
+              <label class="label" for="movieImage">Cargar imagen</label>
+              <input class="input" id="movieImage" name="movieImage" type="file" accept="image/*" />
+              <p class="hint">Formatos: jpg, png, webp (máx. sugerido 2MB)</p>
+            </div>
+
+            <div class="field field--full">
+              <label class="label" for="movieDesc">Descripción</label>
+              <textarea class="textarea" id="movieDesc" name="movieDesc" rows="5" placeholder="Escribe una descripción breve y clara..."></textarea>
+              <p class="hint" data-error-for="movieDesc"></p>
+            </div>
+
+            <div class="field field--full">
+              <label class="label" for="movieTrailer">Link del tráiler (YouTube/Vimeo)</label>
+              <input class="input" id="movieTrailer" name="movieTrailer" type="url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" />
+              <p class="hint" data-error-for="movieTrailer"></p>
+            </div>
+
+            <div class="field field--full">
+              <div class="actions">
+                <button class="btn btn--primary" type="submit">Registrar</button>
+                <button class="btn btn--ghost" type="button" id="btnMovieClear">Limpiar</button>
+              </div>
+              <p class="toast" id="movieCreateMsg" aria-live="polite"></p>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB 2: CONSULTAR PELÍCULAS -->
+      <div class="tabview" id="tab-peliculas-cons">
+        <div class="panel__header">
+          <h2 class="panel__title">Consultar Películas</h2>
+
+          <div class="search">
+            <input class="input" id="movieSearch" type="text" placeholder="Buscar por nombre..." autocomplete="off" />
+            <select class="input" id="movieFilterStatus">
+              <option value="all">Todas</option>
+              <option value="active">Activas</option>
+              <option value="inactive">Inactivas</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="tablewrap">
+          <table class="table" id="moviesTable">
+            <thead>
+              <tr>
+                <th>Imagen</th>
+                <th>Nombre de la película</th>
+                <th>Género</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="moviesTbody">
+              <tr>
+                <td class="muted" colspan="6">Sin datos (luego se conectará a la API).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 3: CLIENTES -->
+      <div class="tabview" id="tab-clientes">
+        <h2 class="panel__title">Consultar clientes</h2>
+
+        <form class="form" id="formClientCreate">
+          <div class="grid grid--clients">
+            <div class="field">
+              <label class="label" for="cliNombre">Nombre</label>
+              <input class="input" id="cliNombre" type="text" autocomplete="off" />
+              <p class="hint" data-error-for="cliNombre"></p>
+            </div>
+
+            <div class="field">
+              <label class="label" for="cliApPat">Apellido paterno</label>
+              <input class="input" id="cliApPat" type="text" autocomplete="off" />
+              <p class="hint" data-error-for="cliApPat"></p>
+            </div>
+
+            <div class="field">
+              <label class="label" for="cliApMat">Apellido materno</label>
+              <input class="input" id="cliApMat" type="text" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label class="label" for="cliCorreo">Correo electrónico</label>
+              <input class="input" id="cliCorreo" type="email" autocomplete="off" />
+              <p class="hint" data-error-for="cliCorreo"></p>
+            </div>
+
+            <div class="field">
+              <label class="label" for="cliClave">Clave (se genera sola)</label>
+              <input class="input" id="cliClave" type="text" readonly value="" placeholder="Se genera al registrar" />
+              <p class="hint">Se mostrará solo al crear el cliente.</p>
+            </div>
+
+            <div class="field field--full">
+              <div class="actions">
+                <button class="btn btn--primary" type="submit">Registrar cliente</button>
+                <button class="btn btn--ghost" type="button" id="btnClientClear">Limpiar</button>
+              </div>
+              <p class="toast" id="clientCreateMsg" aria-live="polite"></p>
+            </div>
+          </div>
+        </form>
+
+        <div class="tablewrap">
+          <table class="table" id="clientsTable">
+            <thead>
+              <tr>
+                <th>Nombre completo</th>
+                <th>Correo / Usuario</th>
+                <th>Fecha de registro</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="clientsTbody">
+              <tr>
+                <td class="muted" colspan="5">Sin datos (luego se conectará a la API).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 4: USUARIOS ADMIN -->
+      <div class="tabview" id="tab-usuarios">
+        <h2 class="panel__title">Registro de usuarios (Administradores)</h2>
+
+        <form class="form" id="formAdminCreate">
+          <div class="grid grid--clients">
+            <div class="field">
+              <label class="label" for="admNombre">Nombre</label>
+              <input class="input" id="admNombre" type="text" autocomplete="off" />
+              <p class="hint" data-error-for="admNombre"></p>
+            </div>
+
+            <div class="field">
+              <label class="label" for="admApPat">Apellido paterno</label>
+              <input class="input" id="admApPat" type="text" autocomplete="off" />
+              <p class="hint" data-error-for="admApPat"></p>
+            </div>
+
+            <div class="field">
+              <label class="label" for="admApMat">Apellido materno</label>
+              <input class="input" id="admApMat" type="text" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label class="label" for="admCorreo">Correo electrónico</label>
+              <input class="input" id="admCorreo" type="email" autocomplete="off" />
+              <p class="hint" data-error-for="admCorreo"></p>
+            </div>
+
+            <div class="field">
+              <label class="label" for="admClave">Clave (se genera sola)</label>
+              <input class="input" id="admClave" type="text" readonly value="" placeholder="Se genera al registrar" />
+              <p class="hint">Se mostrará solo al crear el usuario admin.</p>
+            </div>
+
+            <div class="field field--full">
+              <div class="actions">
+                <button class="btn btn--primary" type="submit">Registrar admin</button>
+                <button class="btn btn--ghost" type="button" id="btnAdminClear">Limpiar</button>
+              </div>
+              <p class="toast" id="adminCreateMsg" aria-live="polite"></p>
+            </div>
+          </div>
+        </form>
+
+        <div class="tablewrap">
+          <table class="table" id="adminsTable">
+            <thead>
+              <tr>
+                <th>Nombre completo</th>
+                <th>Correo / Usuario</th>
+                <th>Fecha de registro</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="adminsTbody">
+              <tr>
+                <td class="muted" colspan="5">Sin datos (luego se conectará a la API).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>© Plataforma de Streaming</span>
+    <span class="muted">Admin Panel</span>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

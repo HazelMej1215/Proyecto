@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iniciar sesión | Streaming</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body class="bg">
+  <header class="topbar">
+    <div class="brand">STREAMING</div>
+  </header>
+
+  <main class="auth">
+    <section class="card">
+      <h1>Iniciar sesión</h1>
+
+      <form id="loginForm" class="form">
+        <label>
+          Correo
+          <input type="email" id="email" placeholder="correo@ejemplo.com" required />
+        </label>
+
+        <label>
+          Contraseña
+          <input type="password" id="password" placeholder="••••••••" required />
+        </label>
+
+        <button type="submit" class="btn">Entrar</button>
+
+        <p class="muted">
+          ¿No tienes cuenta?
+          <a href="registro.html">Regístrate aquí</a>
+        </p>
+
+        <p id="loginMsg" class="msg"></p>
+      </form>
+    </section>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -12,11 +12,9 @@ import androidx.lifecycle.lifecycleScope
 import com.example.streamingapp.network.LoginRequest
 import com.example.streamingapp.network.RetrofitClient
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class LoginActivity : AppCompatActivity() {
-
-    // ✅ CELULAR (tu IP)
-    private val registroUrl = "http://192.168.100.22/Proyecto/cliente_registro_solo.php"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +25,9 @@ class LoginActivity : AppCompatActivity() {
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val tvRegistro = findViewById<TextView>(R.id.tvRegistro)
 
+        val registroUrl = AppConfig.BASE_WEB + "cliente_registro_solo.php"
+
+
         tvRegistro.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(registroUrl)))
         }
@@ -35,17 +36,32 @@ class LoginActivity : AppCompatActivity() {
             val correo = etCorreo.text.toString().trim()
             val pass = etPass.text.toString().trim()
 
+            if (correo.isEmpty() || pass.isEmpty()) {
+                Toast.makeText(this, "Completa correo y contraseña", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             lifecycleScope.launch {
                 try {
-                    val res = RetrofitClient.api.login(LoginRequest(correo, pass))
-                    if (res.ok) {
+                    val resp = RetrofitClient.api.login(LoginRequest(correo, pass))
+
+                    if (resp.ok) {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Bienvenido ${resp.user?.nombre ?: ""}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
                     } else {
-                        Toast.makeText(this@LoginActivity, res.msg ?: "Credenciales incorrectas", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@LoginActivity, resp.msg ?: "Error", Toast.LENGTH_SHORT).show()
                     }
+
+                } catch (e: HttpException) {
+                    Toast.makeText(this@LoginActivity, "HTTP ${e.code()}", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
-                    Toast.makeText(this@LoginActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@LoginActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }

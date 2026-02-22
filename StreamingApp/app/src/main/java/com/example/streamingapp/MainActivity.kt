@@ -9,36 +9,52 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.streamingapp.network.RetrofitClient
 import com.example.streamingapp.ui.PeliculasAdapter
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class MainActivity : AppCompatActivity() {
 
-    companion object {
-        // ✅ CELULAR (tu IP)
-        private const val BASE_WEB = "http://192.168.100.22/Proyecto/"
-        // ✅ EMULADOR (si lo usas)
-        // private const val BASE_WEB = "http://10.0.2.2/Proyecto/"
-    }
+    private lateinit var recycler: RecyclerView
+    private val adapter = PeliculasAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val rv = findViewById<RecyclerView>(R.id.rvPeliculas)
-        rv.layoutManager = LinearLayoutManager(this)
+        recycler = findViewById(R.id.recyclerPeliculas)
+        recycler.layoutManager = LinearLayoutManager(this)
+        recycler.adapter = adapter
 
-        val adapter = PeliculasAdapter(BASE_WEB, mutableListOf())
-        rv.adapter = adapter
+        cargarPeliculas()
+    }
 
+    private fun cargarPeliculas() {
         lifecycleScope.launch {
             try {
-                val res = RetrofitClient.api.peliculas()
-                if (!res.ok) {
-                    Toast.makeText(this@MainActivity, "No se pudieron cargar", Toast.LENGTH_LONG).show()
-                    return@launch
+                val resp = RetrofitClient.api.getPeliculas()
+
+                if (resp.ok) {
+                    adapter.setData(resp.peliculas)
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "No se pudieron cargar las películas",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                adapter.setItems(res.peliculas)
+
+            } catch (e: HttpException) {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Error HTTP ${e.code()}",
+                    Toast.LENGTH_SHORT
+                ).show()
+
             } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    "Error: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

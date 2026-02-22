@@ -19,7 +19,9 @@
             android:layout_height="120dp"
             android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            android:usesCleartextTraffic="true"
+            />
 
         <TextView
             android:id="@+id/tvNombre"

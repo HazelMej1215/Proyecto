@@ -1,29 +1,27 @@
 package com.example.streamingapp.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.streamingapp.R
-import com.example.streamingapp.TrailerActivity
 import com.example.streamingapp.network.Pelicula
 
 class PeliculasAdapter(
-    private val baseWeb: String,
-    private val data: MutableList<Pelicula>
+    private val items: MutableList<Pelicula> = mutableListOf()
 ) : RecyclerView.Adapter<PeliculasAdapter.VH>() {
 
-    class VH(v: View) : RecyclerView.ViewHolder(v) {
-        val img: ImageView = v.findViewById(R.id.imgPoster)
-        val nombre: TextView = v.findViewById(R.id.tvNombre)
-        val genero: TextView = v.findViewById(R.id.tvGenero)
-        val desc: TextView = v.findViewById(R.id.tvDesc)
-        val btn: Button = v.findViewById(R.id.btnVer)
+    fun setData(nuevas: List<Pelicula>) {
+        items.clear()
+        items.addAll(nuevas)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -31,29 +29,38 @@ class PeliculasAdapter(
         return VH(v)
     }
 
-    override fun getItemCount() = data.size
+    override fun onBindViewHolder(holder: VH, position: Int) = holder.bind(items[position])
 
-    override fun onBindViewHolder(h: VH, position: Int) {
-        val p = data[position]
-        h.nombre.text = p.nombre
-        h.genero.text = p.genero
-        h.desc.text = p.descripcion
+    override fun getItemCount(): Int = items.size
 
-        // ruta_imagen viene como: uploads/...
-        val urlImg = baseWeb + p.ruta_imagen
-        Glide.with(h.itemView).load(urlImg).into(h.img)
+    class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val imgPoster = itemView.findViewById<ImageView>(R.id.imgPoster)
+        private val tvNombre = itemView.findViewById<TextView>(R.id.tvNombre)
+        private val tvGenero = itemView.findViewById<TextView>(R.id.tvGenero)
+        private val tvDesc = itemView.findViewById<TextView>(R.id.tvDesc)
+        private val btnVer = itemView.findViewById<Button>(R.id.btnVer)
 
-        h.btn.setOnClickListener {
-            val ctx = h.itemView.context
-            val i = Intent(ctx, TrailerActivity::class.java)
-            i.putExtra("url", p.url_trailer)
-            ctx.startActivity(i)
+        fun bind(p: Pelicula) {
+            tvNombre.text = p.nombre ?: ""
+            tvGenero.text = p.genero ?: ""
+            tvDesc.text = p.descripcion ?: ""
+
+            val urlImg = (p.rutaImagen ?: "").trim()
+
+            Glide.with(itemView)
+                .load(urlImg)
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.no_image)
+                .into(imgPoster)
+
+            btnVer.setOnClickListener {
+                val url = (p.urlTrailer ?: "").trim()
+                if (url.isBlank()) {
+                    Toast.makeText(itemView.context, "No hay trailer", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                itemView.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            }
         }
-    }
-
-    fun setItems(items: List<Pelicula>) {
-        data.clear()
-        data.addAll(items)
-        notifyDataSetChanged()
     }
 }
